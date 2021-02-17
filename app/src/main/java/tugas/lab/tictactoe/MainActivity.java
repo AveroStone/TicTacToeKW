@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //Player 2  >> 2
     int [] gameState = {0,0,0,0,0,0,0,0,0};
 
-    int [][] winningPosotions = {
+    int [][] winningPositions = {
             {0,1,2}, {3,4,5}, {6,7,8},  //rows
             {0,3,6}, {1,4,7}, {2,5,8},  //column
             {0,4,8}, {2,4,6},           //cross
@@ -40,7 +40,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btn_reset = (Button) findViewById(R.id.btn_reset);
 
-        for(int i=0; i < buttons.length; i++){
+        //iteration that will automaticly Create identifier(findViewById) for all 9 button.
+		//so we don't have to create or code it manually one by one.
+		for(int i=0; i < buttons.length; i++){
             String buttonID = "btn_" + i;
             int resourceID  = getResources().getIdentifier(buttonID,"id", getPackageName());
             buttons[i] = (Button)findViewById(resourceID);
@@ -62,34 +64,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String buttonID = v.getResources().getResourceEntryName(v.getId());
         int gameStatePointer = Integer.parseInt(buttonID.substring(buttonID.length()-1, buttonID.length()));
 
-        if (playerTurn) {
-            ((Button) v).setText("X");
-            ((Button) v).setTextColor(Color.parseColor("#FFFFFF"));
-            gameState[gameStatePointer] = 1;
-        } else {
-            ((Button) v).setText("O");
-            ((Button) v).setTextColor(Color.parseColor("#870B0B"));
-            gameState[gameStatePointer] = 2;
+        if (playerTurn) {	//if boolean(playerTurn) is TRUE : that means Player One turn to play
+            ((Button) v).setText("X");	//text on any button that Player One touch or press will be set to "X".
+            ((Button) v).setTextColor(Color.parseColor("#FFFFFF")); //and set the button color to WHITE.
+            gameState[gameStatePointer] = 1;	//value of any particular element of array(gameState) will be set 1 when Player One touch the empty button.
+        } else {			//if boolean(playerTurn) is FALSE : that means Player TWO turn to play
+            ((Button) v).setText("O");	//text on any button that Player Two touch or press will be set to "O".
+            ((Button) v).setTextColor(Color.parseColor("#870B0B"));	//and set the button color to BLOOD RED.
+            gameState[gameStatePointer] = 2;	// value of any particular element of array(gameState) will be set 2 when Player Two touch the empty button.
         }
-        rount++;
-
-        if(checkWinner()){
-            if(playerTurn){
-                scoreP1++;
-                updatePlayerScore();
-                Toast.makeText(this, "Player One Won!", Toast.LENGTH_SHORT).show();
-                playAgain();
-            }else{
-                scoreP2++;
-                updatePlayerScore();
-                Toast.makeText(this, "Player Two Won!", Toast.LENGTH_SHORT).show();
-                playAgain();
+        rount++;	//increase value of variabel round by one (+ 1).
+					//to keep track of how many round the game have been play.
+		
+		//this IF statement will call the method "checkWinner"
+        if(checkWinner()){				//if method "checkWinner" return TRUE, than any code inside IF statement will be execute
+            if(playerTurn){				//check who if the active player?, if it is Player One than:
+                scoreP1++;				//increase value of variabel "scoreP1" by one (+1).
+                updatePlayerScore();	//call method "updatePlayerScore".
+                Toast.makeText(this, "Player One Won!", Toast.LENGTH_SHORT).show();	//show a toast text dialog that will say who win the turn.
+                playAgain();			//call method "playAgain" to reset all the button.
+            }else{						//else if Player Two is the Active player than:
+                scoreP2++;				//increase value of variabel "scoreP2" by one (+1).
+                updatePlayerScore();	//call method "updatePlayerScore".
+                Toast.makeText(this, "Player Two Won!", Toast.LENGTH_SHORT).show();	//show a toast text dialog that will say who win the turn.
+                playAgain();			//call method "playAgain" to reset all the button.
             }
-        }else if(rount == 9){
-            playAgain();
-            Toast.makeText(this, "No Winner!", Toast.LENGTH_SHORT).show();
+		//if method "checkWinner" return FALSE, than check again
+        }else if(rount == 9){	// if the game's turn is all ready 9, that is means no winner, than execute any code inside this second IF.
+            playAgain();		//call method "playAgain."
+            Toast.makeText(this, "No Winner!", Toast.LENGTH_SHORT).show();	////show a toast text dialog that will say no body win the turn.
+		// if there is no button at winning positon yet & the turn is still under 9 turn, than swap the Actice Player.
         }else{
-            playerTurn = !playerTurn;
+            playerTurn = !playerTurn;	//swap the Actice Player.
         }
 
         if(scoreP1 > scoreP2){
@@ -111,10 +117,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
+	
+	//defines checkWinner method
     public boolean checkWinner(){
-        boolean winnerResult = false;
+        boolean winnerResult = false;	//set boolean variable "winnerResult" to false.
 
-        for(int[] winningPosition : winningPosotions){
+        //iteration that will check the winning positon
+		//if the value of any array(gameState) is meet the winning positon that is define in array 2D array (winningPositions)
+		//than the boolean variable(winnerResult) will be set to TRUE.
+		//----IF NOT------
+		//than the boolean variable(winnerResult) will remain false, that means NO WINNER.
+		for(int[] winningPosition : winningPositions){
             if(gameState[winningPosition[0]] == gameState[winningPosition[1]] &&
                     gameState[winningPosition[1]] == gameState[winningPosition[2]] &&
                         gameState[winningPosition[0]] !=0){
@@ -124,18 +137,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return winnerResult;
     }
 
+	//defines updatePlayerScore method
     public void updatePlayerScore(){
-        playerOneScore.setText(Integer.toString(scoreP1));
-        playerTwoScore.setText(Integer.toString(scoreP2));
+        playerOneScore.setText(Integer.toString(scoreP1));	//retrieve integer value from variabel scoreP1 and parse it to String for [playerOneScore] text.
+        playerTwoScore.setText(Integer.toString(scoreP2));	//retrieve integer value from variabel scoreP1 and parse it to String for [playerOneScore] text.
     }
 
-    public void playAgain(){
-        rount  = 0;
-        playerTurn = true;
+    //defines playAgain method
+	public void playAgain(){
+        rount  = 0;         //reset value of round vaariable to 0.
+        playerTurn = true;  //reset player turn to player one.
 
         for (int i = 0; i < buttons.length; i++){
-            gameState[i] = 0;
-            buttons[i].setText("");
+            gameState[i] = 0;       // reset all button to state to 0, button color to default before press or touch.
+            buttons[i].setText(""); // reset button text to empty => "_".
         }
     }
 }
